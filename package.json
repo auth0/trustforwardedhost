@@ -1,7 +1,7 @@
 {
   "name": "trustforwardedhost",
   "description": "Express middleware to trust in the x-forwarded-host header.",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "author": "José F. Romaniello <jfromaniello@gmail.com> (http://joseoncode.com)",
   "repository": {
     "url": "git://github.com/jfromaniello/trustforwardedhost.git"
