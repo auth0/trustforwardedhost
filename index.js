@@ -2,12 +2,17 @@ const net = require('net');
 const dns = require('dns');
 
 module.exports = function(config) {
-  var trustedIps = new Set([]);
+  var trustedIps;
   var dnsEntry;
 
-  if (net.isIPv4(config) || net.isIPv6(config)) {
+  if (config === false) {
+    trustedIps = new Set([]);
+    dnsEntry = false;
+  } else if (net.isIPv4(config) || net.isIPv6(config)) {
     trustedIps = new Set([ config ]);
+    dnsEntry = false;
   } else {
+    trustedIps = new Set([]);
     dnsEntry = config;
   }
 
@@ -29,6 +34,10 @@ module.exports = function(config) {
   return function(req, res, next) {
     if (typeof req.headers['x-forwarded-host'] === 'undefined') {
       return next();
+    }
+
+    if (config === false) {
+      return validateAndNext(false, req, next);
     }
 
     const trusted = req.ips.some(ip => trustedIps.has(ip));

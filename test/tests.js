@@ -27,6 +27,32 @@ function mockrequest(ips, host, forwardedHost) {
 
 describe('trustforwardedhost', function () {
 
+  describe('when not trusting', function() {
+    const tfh = trustforwardedhost(false);
+
+    it('should do nothing if header is not present', function(done) {
+      const request = mockrequest(['2.2.2.2'], 'main.example.com');
+
+      tfh(request, null, () => {
+        assert.notProperty(request, 'x-forwarded-host');
+        assert.equal(request.host, 'main.example.com');
+        done();
+      });
+    });
+
+    it('should ignore the header if it is present', function(done) {
+      const request = mockrequest(['19.20.21.22', '1.2.3.4'],
+                                  'main.example.com',
+                                  'fake.example.com');
+
+      tfh(request, null, () => {
+        assert.notProperty(request, 'x-forwarded-host');
+        assert.equal(request.host, 'main.example.com');
+        done();
+      });
+    });
+  });
+
   describe('when trusting an ip address', function() {
     const tfh = trustforwardedhost('2.2.2.2');
 
@@ -40,7 +66,7 @@ describe('trustforwardedhost', function () {
       });
     });
 
-    it('should remove the header if it is untrusted', function(done) {
+    it('should ignore the header if it is untrusted', function(done) {
       const request = mockrequest(['19.20.21.22', '1.2.3.4'],
                                   'main.example.com',
                                   'fake.example.com');
@@ -89,7 +115,7 @@ describe('trustforwardedhost', function () {
       });
     });
 
-    it('should remove the header if it is untrusted', function(done) {
+    it('should ignore the header if it is untrusted', function(done) {
       const request = mockrequest(['19.20.21.22', '1.2.3.4'],
                                   'main.example.com',
                                   'fake.example.com');
