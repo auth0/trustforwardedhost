@@ -127,7 +127,6 @@ describe('trustforwardedhost', function () {
       });
     });
 
-
     it('should not remove the header if it is trusted', function(done) {
       const request = mockrequest(['19.20.21.22', ip],
                                   'main.example.com',
@@ -140,7 +139,17 @@ describe('trustforwardedhost', function () {
       });
     });
 
+    it('should ignore the header if the LB dns entry is incorrect', function(done) {
+      const tfhUnknownDomain = trustforwardedhost('fafeazfezmffijamfomezaf.com');
+      const request = mockrequest(['19.20.21.22'],
+                                  'main.example.com',
+                                  'fake.example.com');
+
+      tfhUnknownDomain(request, null, () => {
+        assert.notProperty(request, 'x-forwarded-host');
+        assert.equal(request.host, 'main.example.com');
+        done();
+      });
+    });
   });
-
-
 });

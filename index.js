@@ -41,13 +41,11 @@ module.exports = function(config) {
     }
 
     const trusted = req.ips.some(ip => trustedIps.has(ip));
-
     if (!trusted && dnsEntry) {
       //if is not trusted yet
       //fetch the ip addresses and check
       return dns.resolve(dnsEntry, (err, ips) => {
-        if (err) { return next(); }
-        trustedIps = new Set(ips);
+        trustedIps = new Set(err && [] || ips);
         const trusted = req.ips.some(ip => trustedIps.has(ip));
         validateAndNext(trusted, req, next);
       });
